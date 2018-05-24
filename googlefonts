@@ -1,0 +1,37 @@
+server {
+	listen 80;
+	listen [::]:80;
+	
+	server_name fonts.cdn.example.com;
+	access_log	/var/log/nginx/revproxy_access.log;
+	error_log	/var/log/nginx/revproxy_error.log;
+	
+	#location @redirect {
+	#	rewrite ^/(.*)$ $scheme://fonts.googleapis.com/$1 redirect;
+	#}
+	
+	location / {
+		proxy_pass https://fonts.googleapis.com/;
+		proxy_set_header Host fonts.googleapis.com;
+		include conf.d/google-fonts-proxy-common;
+	}
+}
+
+server {
+	listen 80;
+	listen [::]:80;
+	
+	server_name static.cdn.example.com;
+	access_log	/var/log/nginx/revproxy_access.log;
+	error_log	/var/log/nginx/revproxy_error.log;
+
+	location @redirect {
+		rewrite ^/(.*)$ https://fonts.gstatic.com/$1 redirect;
+	}
+
+	location / {
+		proxy_pass https://fonts.gstatic.com/;
+		proxy_set_header Host fonts.gstatic.com;
+		include conf.d/google-fonts-proxy-common;
+	}
+}

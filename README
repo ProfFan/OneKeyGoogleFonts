@@ -1,0 +1,38 @@
+# 反代 Google Fonts
+
+主体来自 https://gist.github.com/gaoyifan/680da074330d2c499d6b
+
+删掉了不是字体的部分
+
+建议不要直接绑定 A 记录用于生产，请在 nginx 前面加 CDN
+
+# Usage
+
+For Ubuntu/Debian
+
+第一步
+
+```
+sudo cp google-fonts-proxy-common /etc/nginx/conf.d
+sudo cp googlefonts /etc/nginx/sites-available
+sudo ln -s /etc/nginx/sites-available/googlefonts /etc/nginx/sites-enabled
+sudo sed -i 's/fonts.cdn.example.com/<你的 fonts 域名>/g' /etc/nginx/sites-available/googlefonts /etc/nginx/conf.d/google-fonts-proxy-common
+sudo sed -i 's/static.cdn.example.com/<你的 static 域名>/g' /etc/nginx/sites-available/googlefonts /etc/nginx/conf.d/google-fonts-proxy-common
+```
+
+第二步
+
+```
+sudo add-apt-repository ppa:certbot/certbot
+sudo apt-get install python-certbot-nginx python3-pip
+# If you use Cloudflare DNS, details see certbot.eff.org
+# 此处也可以用 acme.sh 或 dehydrated 来获取，具体参见其文档
+# sudo pip3 install certbot-dns-cloudflare
+# sudo certbot --dns-cloudflare --dns-cloudflare-credentials /root/.secrets/cloudflare --dns-cloudflare-propagation-seconds 10 -i nginx
+sudo certbot --nginx
+```
+选择你的域名，注意此处建议使用 DNS 获取 LE，否则绑定 CDN 后无法自动更新！
+
+第三步
+
+搞定啦
